@@ -22,6 +22,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private MessageSource messageSource;
 
     //create user
     @RequestMapping(method = RequestMethod.POST, value = "/users")
@@ -45,7 +47,7 @@ public class UserController {
             user.setPassword(userById.get().getPassword());
             return userService.updateUser(user);
         }else{
-            throw new UserNotFoundException("User not found with id - "+user.getId());
+            throw new UserNotFoundException(getMessage("user.not.found",user.getId().toString()));
         }
     }
 
@@ -64,7 +66,7 @@ public class UserController {
         if(user.isPresent()){
             return user.get();
         }else{
-            throw new UserNotFoundException("User not found with id - "+id);
+            throw new UserNotFoundException(getMessage("user.not.found",id));
         }
     }
 
@@ -76,7 +78,7 @@ public class UserController {
         if(usersByFirstName.size()>0){
             return usersByFirstName;
         }else{
-            throw new UserNotFoundException("No users found with firstname - "+firstName);
+            throw new UserNotFoundException(getMessage("user.not.found.firstname",firstName));
         }
     }
 
@@ -88,7 +90,7 @@ public class UserController {
         if(usersByLastName.size()>0){
             return usersByLastName;
         }else{
-            throw new UserNotFoundException("No users found with lastname - "+lastName);
+            throw new UserNotFoundException(getMessage("user.not.found.lastname",lastName));
         }
     }
 
@@ -100,7 +102,7 @@ public class UserController {
         if(userByEmail!=null){
             return userByEmail;
         }else{
-            throw new UserNotFoundException("No user found with email - "+email);
+            throw new UserNotFoundException(getMessage("user.not.found.email",email));
         }
     }
 
@@ -129,5 +131,9 @@ public class UserController {
     public void deleteUserByEmail(@PathVariable(name = "email") String email){
         Long noOfUsersDeleted = userService.deleteUserByEmail(email);
         logger.info("No. of Users deleted -"+noOfUsersDeleted);
+    }
+
+    public String getMessage(String messageKey, String... args){
+        return messageSource.getMessage(messageKey, args, Locale.ENGLISH);
     }
 }

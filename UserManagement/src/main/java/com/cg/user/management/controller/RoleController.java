@@ -7,12 +7,14 @@ import com.cg.user.management.service.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +24,8 @@ public class RoleController {
 
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private MessageSource messageSource;
 
     //Create Role
     @RequestMapping(method = RequestMethod.POST, value = "/roles")
@@ -42,7 +46,7 @@ public class RoleController {
         if(dbRole.isPresent()){
             return roleService.updateRole(role);
         }else{
-            throw new RoleNotFoundException("Role not found with id - "+role.getId());
+            throw new RoleNotFoundException(getMessage("role.not.found", role.getId().toString()));
         }
     }
 
@@ -61,7 +65,7 @@ public class RoleController {
         if(role.isPresent()){
             return role.get();
         }else{
-            throw new RoleNotFoundException("Role not found with id - "+id);
+            throw new RoleNotFoundException(getMessage("role.not.found", id.toString()));
         }
     }
 
@@ -73,7 +77,8 @@ public class RoleController {
         if(roleByCategory.size()>0){
             return roleByCategory;
         }else{
-            throw new RoleNotFoundException("No Roles found for category - "+category);
+            throw new RoleNotFoundException(getMessage("role.not.found.category", category));
+
         }
     }
 
@@ -85,7 +90,7 @@ public class RoleController {
         if(roleByAction.size()>0){
             return roleByAction;
         }else{
-            throw new RoleNotFoundException("No Roles found for action - "+action);
+            throw new RoleNotFoundException(getMessage("role.not.found.action", action));
         }
     }
 
@@ -108,5 +113,9 @@ public class RoleController {
     public void deleteRoleByAction(@PathVariable String action){
         logger.info("Executing deleteRoleByAction method- "+action);
         roleService.deleteRoleByAction(action);
+    }
+
+    public String getMessage(String messageKey, String... args){
+        return messageSource.getMessage(messageKey, args, Locale.ENGLISH);
     }
 }
