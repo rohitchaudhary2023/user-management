@@ -6,12 +6,14 @@ import com.cg.user.management.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -24,6 +26,7 @@ public class UserController {
     //create user
     @RequestMapping(method = RequestMethod.POST, value = "/users")
     public ResponseEntity<Object> createUser(@RequestBody User user){
+
         logger.info("Executing createUser method");
         User newUser = userService.createUser(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -42,7 +45,7 @@ public class UserController {
             user.setPassword(userById.get().getPassword());
             return userService.updateUser(user);
         }else{
-            throw new UserNotFoundException("User not found with id -"+user.getId());
+            throw new UserNotFoundException("User not found with id - "+user.getId());
         }
     }
 
@@ -61,29 +64,44 @@ public class UserController {
         if(user.isPresent()){
             return user.get();
         }else{
-            throw new UserNotFoundException("User not found with id -"+id);
+            throw new UserNotFoundException("User not found with id - "+id);
         }
     }
 
     //fetch user by firstname
-    @RequestMapping(method = RequestMethod.GET, value = "/users/search/firstname/{firstname}")
+    @RequestMapping(method = RequestMethod.GET, value = "/users/firstname/{firstname}")
     public List<User> getUserByFirstName(@PathVariable(name = "firstname") String firstName){
         logger.info("Executing getUserByFirstName method with firstname - "+firstName);
-        return userService.getUserByFirstName(firstName);
+        List<User> usersByFirstName = userService.getUserByFirstName(firstName);
+        if(usersByFirstName.size()>0){
+            return usersByFirstName;
+        }else{
+            throw new UserNotFoundException("No users found with firstname - "+firstName);
+        }
     }
 
     //fetch user by lastname
-    @RequestMapping(method = RequestMethod.GET, value = "/users/search/lastname/{lastname}")
+    @RequestMapping(method = RequestMethod.GET, value = "/users/lastname/{lastname}")
     public List<User> getUserByLastName(@PathVariable(name = "lastname") String lastName){
         logger.info("Executing getUserByLastName method with lastname - "+lastName);
-        return userService.getUserByLastName(lastName);
+        List<User> usersByLastName = userService.getUserByLastName(lastName);
+        if(usersByLastName.size()>0){
+            return usersByLastName;
+        }else{
+            throw new UserNotFoundException("No users found with lastname - "+lastName);
+        }
     }
 
     //fetch user by email
-    @RequestMapping(method = RequestMethod.GET, value = "/users/search/email/{email}")
+    @RequestMapping(method = RequestMethod.GET, value = "/users/email/{email}")
     public User getUserByEmail(@PathVariable(name = "email") String email){
         logger.info("Executing getUserByEmail method with email - "+email);
-        return userService.getUserByEmail(email);
+        User userByEmail = userService.getUserByEmail(email);
+        if(userByEmail!=null){
+            return userByEmail;
+        }else{
+            throw new UserNotFoundException("No user found with email - "+email);
+        }
     }
 
     //delete user by id

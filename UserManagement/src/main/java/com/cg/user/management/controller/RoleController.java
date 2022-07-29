@@ -42,7 +42,7 @@ public class RoleController {
         if(dbRole.isPresent()){
             return roleService.updateRole(role);
         }else{
-            throw new RoleNotFoundException("Role not found with id -"+role.getId());
+            throw new RoleNotFoundException("Role not found with id - "+role.getId());
         }
     }
 
@@ -61,7 +61,7 @@ public class RoleController {
         if(role.isPresent()){
             return role.get();
         }else{
-            throw new RoleNotFoundException("Role not found with id -"+id);
+            throw new RoleNotFoundException("Role not found with id - "+id);
         }
     }
 
@@ -69,14 +69,24 @@ public class RoleController {
     @RequestMapping(method = RequestMethod.GET, value = "/roles/category/{category}")
     public List<Role> getRoleByCategory(@PathVariable String category){
        logger.info("Executing getRoleByCategory method- "+category);
-       return roleService.getRoleByCategory(category);
+        List<Role> roleByCategory = roleService.getRoleByCategory(category);
+        if(roleByCategory.size()>0){
+            return roleByCategory;
+        }else{
+            throw new RoleNotFoundException("No Roles found for category - "+category);
+        }
     }
 
     //  Fetch RolesByAction
     @RequestMapping(method = RequestMethod.GET, value = "/roles/action/{action}")
     public List<Role> getRoleByAction(@PathVariable String action){
         logger.info("Executing getRoleByAction method- "+action);
-        return roleService.getRoleByAction(action);
+        List<Role> roleByAction = roleService.getRoleByAction(action);
+        if(roleByAction.size()>0){
+            return roleByAction;
+        }else{
+            throw new RoleNotFoundException("No Roles found for action - "+action);
+        }
     }
 
     //Delete RoleById

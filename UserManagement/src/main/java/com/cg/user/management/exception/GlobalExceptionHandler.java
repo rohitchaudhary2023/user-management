@@ -20,9 +20,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({Exception.class,
             UserNotFoundException.class,
             RoleNotFoundException.class,
-            InputDataValidationException.class
+            InputDataValidationException.class,
+            DBException.class
+
     })
-    @Nullable
+
     public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus status;
@@ -40,7 +42,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     ex.getMessage(),
                     request.getDescription(false));
             return new ResponseEntity(response, status);
-        } else if (ex instanceof Exception) {
+        }else if (ex instanceof DBException) {
+            status = HttpStatus.BAD_REQUEST;
+            ExceptionResponse response = new ExceptionResponse(new Date(),
+                    ErrorCodes.DB_ERROR.toString(),
+                    ex.getMessage(),
+                    request.getDescription(false));
+            return new ResponseEntity(response, status);
+        }else if (ex instanceof Exception) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             ExceptionResponse response = new ExceptionResponse(new Date(),
                     ErrorCodes.SERVER_ERROR.toString(),

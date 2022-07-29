@@ -12,10 +12,15 @@ import java.util.List;
 @Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByFirstName(String firstName);
+
     List<User> findByLastName(String lastName);
+
     User findByEmail(String email);
+
     Long deleteByFirstName(String firstName);
+
     Long deleteByLastName(String lastName);
+
     Long deleteByEmail(String email);
 
 }

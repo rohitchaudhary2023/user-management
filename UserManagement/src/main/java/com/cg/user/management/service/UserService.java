@@ -17,10 +17,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public Optional<User> getUser(Long userId){
-        return userRepository.findById(userId);
-    }
-
     public User createUser(User user){
         boolean valid = ValidationUtility.isValidPassword(user.getPassword());
         if(!valid){
@@ -42,6 +38,10 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+        User userByEmail = userRepository.findByEmail(user.getEmail());
+        if(userByEmail!=null){
+            throw new InputDataValidationException("User with email "+user.getEmail()+" already exists!");
+        }
         return userRepository.save(user);
     }
 
